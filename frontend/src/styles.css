@@ -364,7 +364,9 @@ button.btn:disabled {
   align-items: flex-end;
   gap: 6px;
   height: 244px;
-  overflow-x: auto;
+  /* overflow visible, damit das Hover-Tooltip oberhalb der Balken sichtbar
+     bleibt und nicht abgeschnitten wird. */
+  overflow: visible;
   flex: 1;
   padding-bottom: 2px;
 }
@@ -373,8 +375,8 @@ button.btn:disabled {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 26px;
-  flex: 1;
+  min-width: 0; /* darf schrumpfen, damit viele Wochen passen */
+  flex: 1 1 0;
   height: 100%;
   cursor: pointer;
 }
