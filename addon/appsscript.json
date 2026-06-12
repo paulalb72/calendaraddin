@@ -1,0 +1,35 @@
+{
+  "timeZone": "Europe/Berlin",
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Calendar",
+        "serviceId": "calendar",
+        "version": "v3"
+      }
+    ]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/calendar.events",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/calendar.addons.execute"
+  ],
+  "urlFetchWhitelist": [
+    "https://DEINE-WEBAPP-DOMAIN/"
+  ],
+  "addOns": {
+    "common": {
+      "name": "Projektzeit",
+      "logoUrl": "https://www.gstatic.com/images/icons/material/system/2x/event_note_black_24dp.png",
+      "useLocaleFromApp": true
+    },
+    "calendar": {
+      "eventOpenTrigger": {
+        "runFunction": "onCalendarEventOpen"
+      },
+      "currentEventAccess": "READ_WRITE"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+services:
+  app:
+    build: .
+    image: projektzeit-app
+    container_name: projektzeit-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      OAUTH_REDIRECT_URI: ${OAUTH_REDIRECT_URI:-http://localhost:8000/api/oauth/callback}
+      CALENDAR_ID: ${CALENDAR_ID:-primary}
+      ADDON_API_TOKEN: ${ADDON_API_TOKEN}
+      APP_PASSWORD: ${APP_PASSWORD}
+      SESSION_SECRET: ${SESSION_SECRET:-}
+      DATA_DIR: /data
+    volumes:
+      # Persistente SQLite-DB + gespeicherter Refresh-Token
+      - projektzeit-data:/data
+
+volumes:
+  projektzeit-data:
