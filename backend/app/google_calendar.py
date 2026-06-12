@@ -124,11 +124,25 @@ def compute_report(db: Session, date_from: str, date_to: str) -> dict:
     """
     service = _calendar_service(db)
 
-    cal = service.calendars().get(calendarId=settings.calendar_id).execute()
-    cal_tz = cal.get("timeZone", "UTC")  # R-05: Zeitzone des Hauptkalenders
+    # R-05: Zeitzone des Hauptkalenders. Sie steht in jeder events.list-Antwort,
+    # daher kein calendars().get() (das wäre mit dem reinen events.readonly-Scope
+    # nicht erlaubt -> 403). Erst grob in UTC abfragen, um die TZ zu lernen.
+    probe = (
+        service.events()
+        .list(
+            calendarId=settings.calendar_id,
+            maxResults=1,
+            singleEvents=True,
+            timeMin=f"{date_from}T00:00:00Z",
+            timeMax=f"{date_to}T23:59:59Z",
+        )
+        .execute()
+    )
+    cal_tz = probe.get("timeZone", "UTC")
 
-    time_min = f"{date_from}T00:00:00"
-    time_max = f"{date_to}T23:59:59"
+    # Saubere Grenzen mit der Kalender-Zeitzone.
+    time_min = _to_rfc3339(f"{date_from}T00:00:00", cal_tz)
+    time_max = _to_rfc3339(f"{date_to}T23:59:59", cal_tz)
 
     seconds_by_project: dict[str | None, float] = defaultdict(float)
 
@@ -138,8 +152,8 @@ def compute_report(db: Session, date_from: str, date_to: str) -> dict:
             service.events()
             .list(
                 calendarId=settings.calendar_id,
-                timeMin=_to_rfc3339(time_min, cal_tz),
-                timeMax=_to_rfc3339(time_max, cal_tz),
+                timeMin=time_min,
+                timeMax=time_max,
                 singleEvents=True,  # R-02: Serien in Einzelvorkommen expandieren
                 orderBy="startTime",
                 maxResults=2500,

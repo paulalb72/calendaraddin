@@ -18,8 +18,8 @@ var PREFIX_RE = /^\[[^\]]*\]\s*/; // erkennt ein vorhandenes "[...] "-Präfix
 /** Einmalige Konfigurationshilfe – Werte eintragen und einmal ausführen. */
 function setupConfig() {
   PropertiesService.getScriptProperties().setProperties({
-    WEBAPP_URL: 'https://DEINE-WEBAPP-DOMAIN',
-    ADDON_API_TOKEN: 'DEIN_ADDON_API_TOKEN'
+    WEBAPP_URL: 'https://timetracker.makemyki.de',
+    ADDON_API_TOKEN: 'DEIN_ADDON_API_TOKEN' // <- denselben Wert wie in Coolify eintragen
   });
 }
 
@@ -34,6 +34,21 @@ function getConfig_() {
 /* -------------------------------------------------------------------------- */
 /* UI-Aufbau                                                                  */
 /* -------------------------------------------------------------------------- */
+
+/** Start-Karte: erscheint, wenn man das Add-on-Icon ohne offenen Termin anklickt.
+ *  Sorgt dafür, dass das Icon zuverlässig in der Seitenleiste auftaucht. */
+function onHomepage(e) {
+  var section = CardService.newCardSection()
+    .addWidget(
+      CardService.newTextParagraph().setText(
+        'Öffne einen Termin im Kalender, um ihm ein Projekt zuzuweisen.'
+      )
+    );
+  return CardService.newCardBuilder()
+    .setHeader(CardService.newCardHeader().setTitle('Projektzeit'))
+    .addSection(section)
+    .build();
+}
 
 /** Trigger beim Öffnen eines Termins (eventOpenTrigger). */
 function onCalendarEventOpen(e) {

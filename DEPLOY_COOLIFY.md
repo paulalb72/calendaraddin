@@ -15,7 +15,7 @@ erreichbar – genau das braucht das Apps-Script-Add-on (Anforderung A-02), um
 
 - Eine laufende **Coolify-Instanz** auf einem Server mit öffentlicher IP.
 - Eine **Domain/Subdomain**, deren DNS-`A`-Record auf den Server zeigt
-  (z. B. `projektzeit.deine-domain.tld`).
+  (z. B. `timetracker.makemyki.de`).
 - Der Code muss in einem **Git-Repository** liegen, auf das Coolify zugreifen kann
   (GitHub/GitLab/Gitea oder eine öffentliche/Deploy-Key-Repo-URL).
 
@@ -47,7 +47,7 @@ git push -u origin main
 ## 2. Netzwerk / Domain
 
 1. **Ports Exposes:** `8000` (der Port, auf dem uvicorn lauscht).
-2. **Domains:** deine Domain eintragen, z. B. `https://projektzeit.deine-domain.tld`.
+2. **Domains:** deine Domain eintragen, z. B. `https://timetracker.makemyki.de`.
    - Coolify erzeugt automatisch das Let's-Encrypt-Zertifikat und proxyt auf Port 8000.
 3. **Health Check Path** (falls abgefragt): `/api/health`.
    *(Das Dockerfile bringt bereits einen `HEALTHCHECK` mit.)*
@@ -70,7 +70,7 @@ Default gesetzt) und speichert dort auch den OAuth-Refresh-Token.
 |---|---|
 | `GOOGLE_CLIENT_ID` | aus Google Cloud (OAuth-Client) |
 | `GOOGLE_CLIENT_SECRET` | aus Google Cloud (als *Secret* markieren) |
-| `OAUTH_REDIRECT_URI` | `https://projektzeit.deine-domain.tld/api/oauth/callback` |
+| `OAUTH_REDIRECT_URI` | `https://timetracker.makemyki.de/api/oauth/callback` |
 | `CALENDAR_ID` | `primary` |
 | `ADDON_API_TOKEN` | langes Zufallstoken (als *Secret*) – identisch im Add-on |
 | `APP_PASSWORD` | dein UI-Login-Passwort (als *Secret*) |
@@ -87,7 +87,7 @@ deinen OAuth-Client (Webanwendung) öffnen und unter **Autorisierte Redirect-URI
 ergänzen:
 
 ```
-https://projektzeit.deine-domain.tld/api/oauth/callback
+https://timetracker.makemyki.de/api/oauth/callback
 ```
 
 (Der OAuth-Zustimmungsbildschirm bleibt im **Testmodus**, dein Gmail als Testnutzer –
@@ -105,10 +105,10 @@ keine Google-Verifizierung nötig.)
 ## 7. Add-on verbinden
 
 Im Apps-Script-Add-on ([addon/README.md](addon/README.md)):
-- `setupConfig()`: `WEBAPP_URL = https://projektzeit.deine-domain.tld`,
+- `setupConfig()`: `WEBAPP_URL = https://timetracker.makemyki.de`,
   `ADDON_API_TOKEN = <derselbe Wert wie in Coolify>`.
 - In `appsscript.json` die `urlFetchWhitelist` auf
-  `https://projektzeit.deine-domain.tld/` setzen.
+  `https://timetracker.makemyki.de/` setzen.
 
 ---
 

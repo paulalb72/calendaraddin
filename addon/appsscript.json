@@ -14,16 +14,22 @@
   "oauthScopes": [
     "https://www.googleapis.com/auth/calendar.events",
     "https://www.googleapis.com/auth/script.external_request",
-    "https://www.googleapis.com/auth/calendar.addons.execute"
+    "https://www.googleapis.com/auth/calendar.addons.execute",
+    "https://www.googleapis.com/auth/calendar.addons.current.event.read",
+    "https://www.googleapis.com/auth/calendar.addons.current.event.write",
+    "https://www.googleapis.com/auth/script.locale"
   ],
   "urlFetchWhitelist": [
-    "https://DEINE-WEBAPP-DOMAIN/"
+    "https://timetracker.makemyki.de/"
   ],
   "addOns": {
     "common": {
       "name": "Projektzeit",
       "logoUrl": "https://www.gstatic.com/images/icons/material/system/2x/event_note_black_24dp.png",
-      "useLocaleFromApp": true
+      "useLocaleFromApp": true,
+      "homepageTrigger": {
+        "runFunction": "onHomepage"
+      }
     },
     "calendar": {
       "eventOpenTrigger": {

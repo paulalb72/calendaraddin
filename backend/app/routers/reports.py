@@ -40,5 +40,7 @@ def report(
 
     try:
         return compute_report(db, date_from, date_to)
-    except RuntimeError as exc:
-        raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(exc))
+    except HTTPException:
+        raise
+    except Exception as exc:  # noqa: BLE001 – Fehler lesbar an die UI weiterreichen
+        raise HTTPException(status.HTTP_502_BAD_GATEWAY, f"{type(exc).__name__}: {exc}")

@@ -8,3 +8,4 @@ google-auth-oauthlib==1.2.1
 google-api-python-client==2.157.0
 itsdangerous==2.2.0
 python-multipart==0.0.20
+tzdata==2024.2
