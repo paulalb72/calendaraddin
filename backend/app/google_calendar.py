@@ -4,7 +4,7 @@ Der OAuth-Refresh-Token wird in der DB (Setting-Tabelle) gespeichert (AUTH-02).
 Die Stunden je Projekt werden live aus dem Kalender berechnet (D-04, F-12).
 """
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
@@ -213,14 +213,127 @@ def compute_report(db: Session, date_from: str, date_to: str) -> dict:
     }
 
 
-def _to_rfc3339(local_naive: str, tz_name: str) -> str:
-    """Wandelt eine naive lokale Zeit in einen RFC3339-String mit Offset der
-    Kalender-Zeitzone um."""
+def _zone(tz_name: str):
     try:
         from zoneinfo import ZoneInfo
 
-        tz = ZoneInfo(tz_name)
+        return ZoneInfo(tz_name)
     except Exception:
-        tz = timezone.utc
-    dt = datetime.fromisoformat(local_naive).replace(tzinfo=tz)
+        return timezone.utc
+
+
+def _to_rfc3339(local_naive: str, tz_name: str) -> str:
+    """Wandelt eine naive lokale Zeit in einen RFC3339-String mit Offset der
+    Kalender-Zeitzone um."""
+    dt = datetime.fromisoformat(local_naive).replace(tzinfo=_zone(tz_name))
     return dt.isoformat()
+
+
+def compute_dashboard(db: Session, project_id: str) -> dict:
+    """Dashboard-Daten für EIN Projekt:
+
+    - KPIs: Stunden in den letzten 7 / 30 Tagen und gesamt.
+    - Wochenbuckets (Mo–So) ab dem ersten Termin des Projekts bis zur aktuellen
+      Woche, lückenlos (Wochen ohne Zeit = 0).
+
+    Nutzt den privateExtendedProperty-Filter, um nur Termine dieses Projekts zu
+    laden (effizient). Ganztägige Termine werden ignoriert (R-01).
+    """
+    service = _calendar_service(db)
+
+    now_utc = datetime.now(timezone.utc).isoformat()
+
+    # Kalender-Zeitzone aus einer events.list-Antwort (kein calendars.get nötig).
+    probe = (
+        service.events()
+        .list(
+            calendarId=settings.calendar_id,
+            maxResults=1,
+            singleEvents=True,
+            timeMin="2000-01-01T00:00:00Z",
+            timeMax=now_utc,
+        )
+        .execute()
+    )
+    cal_tz = probe.get("timeZone", "UTC")
+    tz = _zone(cal_tz)
+    now = datetime.now(tz)
+
+    last7 = last30 = total = 0.0
+    weekly: dict[object, float] = defaultdict(float)
+    first_start = None
+
+    page_token = None
+    while True:
+        resp = (
+            service.events()
+            .list(
+                calendarId=settings.calendar_id,
+                singleEvents=True,  # R-02: Serien einzeln zählen
+                orderBy="startTime",
+                privateExtendedProperty=f"projectId={project_id}",
+                timeMin="2000-01-01T00:00:00Z",
+                timeMax=now_utc,
+                maxResults=2500,
+                pageToken=page_token,
+            )
+            .execute()
+        )
+
+        for event in resp.get("items", []):
+            start = event.get("start", {})
+            end = event.get("end", {})
+            if "dateTime" not in start or "dateTime" not in end:
+                continue  # R-01: ganztägige ignorieren
+
+            s = _parse_dt(start["dateTime"]).astimezone(tz)
+            e = _parse_dt(end["dateTime"]).astimezone(tz)
+            hours = (e - s).total_seconds() / 3600.0
+            if hours <= 0:
+                continue
+
+            total += hours
+            if s >= now - timedelta(days=7):
+                last7 += hours
+            if s >= now - timedelta(days=30):
+                last30 += hours
+
+            monday = s.date() - timedelta(days=s.weekday())
+            weekly[monday] += hours
+            if first_start is None or s < first_start:
+                first_start = s
+
+        page_token = resp.get("nextPageToken")
+        if not page_token:
+            break
+
+    # Lückenlose Wochenliste vom ersten Termin bis zur aktuellen Woche.
+    weeks = []
+    if first_start is not None:
+        cur_monday = now.date() - timedelta(days=now.weekday())
+        m = first_start.date() - timedelta(days=first_start.weekday())
+        while m <= cur_monday:
+            iso = m.isocalendar()
+            weeks.append(
+                {
+                    "week_start": m.isoformat(),
+                    "label": f"KW{iso[1]:02d}",
+                    "hours": round(weekly.get(m, 0.0), 2),
+                }
+            )
+            m += timedelta(days=7)
+
+    project = db.get(Project, project_id)
+    name = project.name if project else UNKNOWN_LABEL
+
+    return {
+        "project_id": project_id,
+        "project_name": name,
+        "timezone": cal_tz,
+        "weeks": weeks,
+        "kpis": {
+            "last_7_days": round(last7, 2),
+            "last_30_days": round(last30, 2),
+            "total": round(total, 2),
+        },
+    }

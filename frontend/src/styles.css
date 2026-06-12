@@ -1,10 +1,35 @@
-:root {
-  --bg: #f5f6f8;
+/* ============================ Theme-Variablen ============================ */
+:root,
+:root[data-theme="dark"] {
+  --bg: #0b0d13;
+  --bg-grad: radial-gradient(1200px 600px at 80% -10%, #1b1f3a 0%, transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, #122033 0%, transparent 55%);
+  --card: #14171f;
+  --card-2: #1a1e28;
+  --border: #262b37;
+  --text: #e7e9ee;
+  --muted: #8b93a7;
+  --primary: #6366f1;
+  --primary-2: #22d3ee;
+  --accent-grad: linear-gradient(135deg, #6366f1 0%, #22d3ee 100%);
+  --danger: #f87171;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-theme="light"] {
+  --bg: #f4f6fb;
+  --bg-grad: radial-gradient(1000px 500px at 85% -10%, #e5e9ff 0%, transparent 60%),
+    radial-gradient(800px 400px at -10% 5%, #dff3ff 0%, transparent 55%);
   --card: #ffffff;
-  --border: #e2e5ea;
-  --primary: #2f6feb;
-  --text: #1c2330;
-  --muted: #6b7280;
+  --card-2: #f7f9fc;
+  --border: #e4e8f0;
+  --text: #141a26;
+  --muted: #5d6577;
+  --primary: #4f46e5;
+  --primary-2: #0891b2;
+  --accent-grad: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+  --danger: #dc2626;
+  --shadow: 0 10px 30px rgba(20, 30, 60, 0.08);
 }
 
 * {
@@ -13,111 +38,189 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
   background: var(--bg);
+  background-image: var(--bg-grad);
+  background-attachment: fixed;
   color: var(--text);
+  -webkit-font-smoothing: antialiased;
 }
 
 .container {
-  max-width: 860px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 24px 16px 64px;
+  padding: 28px 18px 80px;
 }
 
-header.app-header {
+.center-screen {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================ Header ============================ */
+.app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: var(--accent-grad);
+  box-shadow: 0 0 18px rgba(99, 102, 241, 0.55);
 }
 
 h1 {
   font-size: 22px;
+  margin: 0;
+  letter-spacing: -0.02em;
 }
 
-.tabs {
+.header-actions {
   display: flex;
-  gap: 8px;
-  margin: 16px 0;
+  gap: 10px;
+  align-items: center;
+}
+
+.icon-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* ============================ Cards ============================ */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+h2 {
+  font-size: 16px;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* ============================ Tabs ============================ */
+.tabs {
+  display: inline-flex;
+  gap: 4px;
+  margin: 4px 0 18px;
+  padding: 4px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
 }
 
 .tabs button {
   background: none;
-  border: 1px solid var(--border);
-  padding: 8px 14px;
-  border-radius: 8px;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 9px;
   cursor: pointer;
   color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.15s ease;
 }
 
 .tabs button.active {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--accent-grad);
   color: #fff;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
 }
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px;
-  margin-bottom: 16px;
-}
-
+/* ============================ Buttons / Inputs ============================ */
 input[type="text"],
 input[type="password"],
-input[type="date"] {
-  padding: 9px 11px;
+input[type="date"],
+.select {
+  padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
+  background: var(--card-2);
+  color: var(--text);
+  outline: none;
+}
+
+input:focus,
+.select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+}
+
+.select {
+  min-width: 240px;
+  cursor: pointer;
 }
 
 button.btn {
-  background: var(--primary);
+  background: var(--accent-grad);
   color: #fff;
   border: none;
-  padding: 9px 16px;
-  border-radius: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+  transition: transform 0.1s ease, opacity 0.15s ease;
+}
+
+button.btn:hover {
+  transform: translateY(-1px);
 }
 
 button.btn.secondary {
-  background: #eef1f6;
+  background: var(--card-2);
   color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: none;
 }
 
 button.btn:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
+  transform: none;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  text-align: left;
-  padding: 10px 8px;
-  border-bottom: 1px solid var(--border);
+/* ============================ Helpers ============================ */
+.muted {
+  color: var(--muted);
   font-size: 14px;
 }
-
-th {
-  color: var(--muted);
-  font-weight: 600;
+.small {
+  font-size: 12px;
 }
-
-.bar {
-  height: 10px;
-  background: var(--primary);
-  border-radius: 5px;
-}
-
 .row {
   display: flex;
   gap: 10px;
@@ -125,30 +228,247 @@ th {
   flex-wrap: wrap;
 }
 
-.muted {
-  color: var(--muted);
-  font-size: 13px;
-}
-
 .badge {
   font-size: 12px;
-  padding: 2px 8px;
+  font-weight: 600;
+  padding: 3px 10px;
   border-radius: 999px;
-  background: #e8f0ff;
-  color: var(--primary);
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--primary-2);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+.badge.off {
+  background: var(--card-2);
+  color: var(--muted);
+  border-color: var(--border);
 }
 
-.badge.off {
-  background: #f1f1f4;
+.error,
+.error-card {
+  color: var(--danger);
+  font-size: 13px;
+}
+.error-card {
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
+.spinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================ Connection card ============================ */
+.conn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ============================ Dashboard ============================ */
+.dashboard .toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+@media (max-width: 640px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpi {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.kpi::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--accent-grad);
+}
+.kpi.a1::before {
+  background: linear-gradient(180deg, #6366f1, #818cf8);
+}
+.kpi.a2::before {
+  background: linear-gradient(180deg, #22d3ee, #38bdf8);
+}
+.kpi.a3::before {
+  background: linear-gradient(180deg, #a855f7, #ec4899);
+}
+
+.kpi-label {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.kpi-value {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.kpi-unit {
+  font-size: 16px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* ============================ Bar chart ============================ */
+.chart {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+.chart-grid {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 220px;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: right;
+  padding-bottom: 24px;
+  min-width: 40px;
+}
+
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 244px;
+  overflow-x: auto;
+  flex: 1;
+  padding-bottom: 2px;
+}
+
+.bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 26px;
+  flex: 1;
+  height: 100%;
+  cursor: pointer;
+}
+
+.bar-track {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.bar-fill {
+  width: 70%;
+  max-width: 26px;
+  min-height: 3px;
+  border-radius: 6px 6px 3px 3px;
+  background: var(--accent-grad);
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+.bar-col:hover .bar-fill {
+  filter: brightness(1.15);
+  transform: scaleY(1.02);
+  transform-origin: bottom;
+}
+.bar-fill.empty {
+  background: var(--border);
+  opacity: 0.5;
+}
+
+.bar-label {
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--muted);
+  height: 16px;
+  white-space: nowrap;
+}
+.bar-label.active {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.bar-tip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 7px 10px;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: var(--shadow);
+  z-index: 5;
+  pointer-events: none;
+}
+.bar-tip strong {
+  font-size: 14px;
+}
+.bar-tip span {
+  font-size: 11px;
   color: var(--muted);
 }
 
-.error {
-  color: #b42318;
-  font-size: 13px;
+/* ============================ Tables (Projekte) ============================ */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
+/* ============================ Login ============================ */
 .login-wrap {
-  max-width: 360px;
-  margin: 80px auto;
+  max-width: 380px;
+  margin: 12vh auto;
+}
+.login-wrap .brand {
+  justify-content: center;
+  margin-bottom: 18px;
 }

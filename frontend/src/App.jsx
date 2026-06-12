@@ -2,12 +2,24 @@ import React, { useEffect, useState } from "react";
 import { api } from "./api";
 import Login from "./components/Login";
 import ProjectsTab from "./components/ProjectsTab";
-import ReportTab from "./components/ReportTab";
+import DashboardTab from "./components/DashboardTab";
 import ConnectionCard from "./components/ConnectionCard";
+
+function useTheme() {
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("theme") || "dark"
+  );
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+  return [theme, setTheme];
+}
 
 export default function App() {
   const [authed, setAuthed] = useState(null);
-  const [tab, setTab] = useState("report");
+  const [tab, setTab] = useState("dashboard");
+  const [theme, setTheme] = useTheme();
 
   async function check() {
     try {
@@ -28,7 +40,11 @@ export default function App() {
   }
 
   if (authed === null) {
-    return <div className="container">Lädt…</div>;
+    return (
+      <div className="container center-screen">
+        <div className="spinner" />
+      </div>
+    );
   }
 
   if (!authed) {
@@ -38,20 +54,32 @@ export default function App() {
   return (
     <div className="container">
       <header className="app-header">
-        <h1>Projektzeit-Erfassung</h1>
-        <button className="btn secondary" onClick={logout}>
-          Logout
-        </button>
+        <div className="brand">
+          <span className="brand-dot" />
+          <h1>Projektzeit</h1>
+        </div>
+        <div className="header-actions">
+          <button
+            className="icon-btn"
+            title="Theme wechseln"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
+          <button className="btn secondary" onClick={logout}>
+            Logout
+          </button>
+        </div>
       </header>
 
       <ConnectionCard />
 
       <div className="tabs">
         <button
-          className={tab === "report" ? "active" : ""}
-          onClick={() => setTab("report")}
+          className={tab === "dashboard" ? "active" : ""}
+          onClick={() => setTab("dashboard")}
         >
-          Auswertung
+          Dashboard
         </button>
         <button
           className={tab === "projects" ? "active" : ""}
@@ -61,7 +89,7 @@ export default function App() {
         </button>
       </div>
 
-      {tab === "report" ? <ReportTab /> : <ProjectsTab />}
+      {tab === "dashboard" ? <DashboardTab /> : <ProjectsTab />}
     </div>
   );
 }

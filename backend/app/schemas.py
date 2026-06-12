@@ -50,3 +50,23 @@ class ReportResponse(BaseModel):
 
 class OAuthStatus(BaseModel):
     connected: bool
+
+
+class WeekBucket(BaseModel):
+    week_start: str  # Montag der Woche (ISO-Datum)
+    label: str       # z. B. "KW23"
+    hours: float
+
+
+class DashboardKpis(BaseModel):
+    last_7_days: float
+    last_30_days: float
+    total: float
+
+
+class DashboardResponse(BaseModel):
+    project_id: str
+    project_name: str
+    timezone: str
+    weeks: list[WeekBucket]
+    kpis: DashboardKpis

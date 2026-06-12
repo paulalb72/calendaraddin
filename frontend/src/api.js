@@ -48,4 +48,7 @@ export const api = {
     if (to) params.set("date_to", to);
     return request(`/api/report?${params.toString()}`);
   },
+
+  dashboard: (projectId) =>
+    request(`/api/dashboard?project_id=${encodeURIComponent(projectId)}`),
 };

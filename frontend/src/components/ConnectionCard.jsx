@@ -19,23 +19,23 @@ export default function ConnectionCard() {
 
   return (
     <div className="card">
-      <div className="row" style={{ justifyContent: "space-between" }}>
+      <div className="conn">
         <div>
           <h2 style={{ margin: 0 }}>Google-Kalender-Verbindung</h2>
-          <p className="muted" style={{ margin: "4px 0 0" }}>
+          <p className="muted small" style={{ margin: "5px 0 0" }}>
             {connected == null
               ? "Status wird geprüft…"
               : connected
-              ? "Verbunden – Auswertung ist möglich."
+              ? "Verbunden – Dashboard ist aktiv."
               : "Nicht verbunden – bitte einmalig autorisieren."}
           </p>
         </div>
         <span className={"badge" + (connected ? "" : " off")}>
-          {connected ? "Verbunden" : "Getrennt"}
+          {connected ? "● Verbunden" : "○ Getrennt"}
         </span>
       </div>
-      {!connected && (
-        <p style={{ marginTop: 12 }}>
+      {connected === false && (
+        <p style={{ marginTop: 14, marginBottom: 0 }}>
           <a className="btn" href="/api/oauth/start" style={{ textDecoration: "none" }}>
             Mit Google verbinden
           </a>

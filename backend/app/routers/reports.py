@@ -10,8 +10,8 @@ from sqlalchemy.orm import Session
 
 from ..auth import require_ui_session
 from ..database import get_db
-from ..google_calendar import compute_report, is_connected
-from ..schemas import ReportResponse
+from ..google_calendar import compute_dashboard, compute_report, is_connected
+from ..schemas import DashboardResponse, ReportResponse
 
 router = APIRouter(prefix="/api")
 
@@ -40,6 +40,25 @@ def report(
 
     try:
         return compute_report(db, date_from, date_to)
+    except HTTPException:
+        raise
+    except Exception as exc:  # noqa: BLE001 – Fehler lesbar an die UI weiterreichen
+        raise HTTPException(status.HTTP_502_BAD_GATEWAY, f"{type(exc).__name__}: {exc}")
+
+
+@router.get(
+    "/dashboard",
+    response_model=DashboardResponse,
+    dependencies=[Depends(require_ui_session)],
+)
+def dashboard(project_id: str = Query(...), db: Session = Depends(get_db)):
+    if not is_connected(db):
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "Google-Konto ist nicht verbunden. Bitte zuerst OAuth durchführen.",
+        )
+    try:
+        return compute_dashboard(db, project_id)
     except HTTPException:
         raise
     except Exception as exc:  # noqa: BLE001 – Fehler lesbar an die UI weiterreichen
