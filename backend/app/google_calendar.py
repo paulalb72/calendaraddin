@@ -6,6 +6,7 @@ Die Stunden je Projekt werden live aus dem Kalender berechnet (D-04, F-12).
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 
+from google.auth.exceptions import RefreshError
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
@@ -38,6 +39,13 @@ def set_setting(db: Session, key: str, value: str) -> None:
     else:
         db.add(Setting(key=key, value=value))
     db.commit()
+
+
+def delete_setting(db: Session, key: str) -> None:
+    row = db.get(Setting, key)
+    if row:
+        db.delete(row)
+        db.commit()
 
 
 # --------------------------------------------------------------------------- #
@@ -100,7 +108,17 @@ def _credentials(db: Session) -> Credentials:
         client_secret=settings.google_client_secret,
         scopes=SCOPES,
     )
-    creds.refresh(GoogleRequest())
+    try:
+        creds.refresh(GoogleRequest())
+    except RefreshError as exc:
+        # Token abgelaufen/widerrufen -> entfernen, damit die UI wieder
+        # "Getrennt" zeigt und zur Neuverbindung auffordert.
+        delete_setting(db, REFRESH_TOKEN_KEY)
+        raise RuntimeError(
+            "Google-Verbindung abgelaufen oder widerrufen. Bitte erneut "
+            "'Mit Google verbinden'. Tipp: OAuth-Zustimmungsbildschirm auf "
+            "'In Produktion' setzen - im Testmodus laufen Tokens nach 7 Tagen ab."
+        ) from exc
     return creds
 
 
